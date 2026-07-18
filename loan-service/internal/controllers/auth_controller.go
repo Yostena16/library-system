@@ -19,7 +19,7 @@ type RegisterInput struct {
 
 // Register creates a new member account.
 func Register(c *gin.Context) {
-	var input RegisterInput //RegisterInput is a struct which hold empty inputs like name:" ", the c.ShouldBindJSON fills the data and its what the client send
+	var input RegisterInput
 
 	// 1. Read + validate the JSON body
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -64,14 +64,14 @@ func Login(c *gin.Context) {
 	var input LoginInput
 
 	// 1. Read + validate the body
-	if err := c.ShouldBindJSON(&input); err != nil {
+	if err := c.ShouldBindJSON(&input); err != nil { //bind the Input from our request to input
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	// 2. Find the member by email
 	var member models.Member
-	if err := database.DB.Where("email = ?", input.Email).First(&member).Error; err != nil {
+	if err := database.DB.Where("email = ?", input.Email).First(&member).Error; err != nil { //? is like placeholder go add input.email safely and First(&member) fetches the first result found in the database that matches the query and stores it in the member struct
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid email or password"})
 		return
 	}
@@ -83,7 +83,7 @@ func Login(c *gin.Context) {
 	}
 
 	// 4. Generate a JWT token
-	token, err := utils.GenerateToken(member.ID)
+	token, err := utils.GenerateToken(member.ID, member.Role)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not create token"})
 		return
@@ -91,6 +91,6 @@ func Login(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "login successful",
-		"token":   token,
+		"token":   token, //hand the token to the client
 	})
 }

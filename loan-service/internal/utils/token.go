@@ -9,7 +9,7 @@ import (
 )
 
 // GenerateToken creates a signed JWT for a given member ID.
-func GenerateToken(memberID uint) (string, error) {
+func GenerateToken(memberID uint, role string) (string, error) {
 	// How long until the token expires (default 24h)
 	hours, err := strconv.Atoi(os.Getenv("JWT_EXPIRY_HOURS"))
 	if err != nil || hours == 0 {
@@ -19,10 +19,11 @@ func GenerateToken(memberID uint) (string, error) {
 	// "Claims" = the data we store inside the token
 	claims := jwt.MapClaims{
 		"member_id": memberID,
+		"role":      role,
 		"exp":       time.Now().Add(time.Duration(hours) * time.Hour).Unix(),
 	}
 
 	// Create the token, then sign it with our secret key
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims) //the signing algorithm to use (HS256)
 	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 }
