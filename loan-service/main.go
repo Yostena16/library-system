@@ -21,7 +21,7 @@ func main() {
 	database.Connect()
 
 	// Auto-migrate: make the tables match our models
-	if err := database.DB.AutoMigrate(&models.Member{}); err != nil {
+	if err := database.DB.AutoMigrate(&models.Member{}, &models.Loan{}); err != nil {
 		log.Fatal("❌ Migration failed: ", err)
 	}
 	log.Println("✅ Database migrated")
