@@ -2,13 +2,13 @@ package main
 
 import (
 	"log"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
 	"loan-service/internal/database"
 	"loan-service/internal/models"
+	"loan-service/internal/routes"
 )
 
 func main() {
@@ -28,12 +28,7 @@ func main() {
 
 	router := gin.Default()
 
-	router.GET("/book", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"status":  "ok",
-			"service": "loan-service",
-		})
-	})
+	routes.SetupRoutes(router)
 
 	router.Run(":8082")
 }
