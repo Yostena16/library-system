@@ -107,3 +107,13 @@ func ReturnBook(c *gin.Context) {
 		"fine":    fine, // null if returned on time
 	})
 }
+
+// GetMyLoans lists all loans belonging to the logged-in member.
+func GetMyLoans(c *gin.Context) {
+	memberID, _ := c.Get("member_id")
+
+	var loans []models.Loan
+	database.DB.Where("member_id = ?", memberID).Order("id desc").Find(&loans)
+
+	c.JSON(http.StatusOK, gin.H{"loans": loans})
+}
