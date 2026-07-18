@@ -8,6 +8,7 @@ import (
 	"github.com/joho/godotenv"
 
 	"loan-service/internal/database"
+	"loan-service/internal/models"
 )
 
 func main() {
@@ -18,6 +19,12 @@ func main() {
 
 	// Connect to PostgreSQL
 	database.Connect()
+
+	// Auto-migrate: make the tables match our models
+	if err := database.DB.AutoMigrate(&models.Member{}); err != nil {
+		log.Fatal("❌ Migration failed: ", err)
+	}
+	log.Println("✅ Database migrated")
 
 	router := gin.Default()
 
