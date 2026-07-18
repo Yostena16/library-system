@@ -17,6 +17,16 @@ func main() {
 			"service": "catalog-service",
 		})
 	})
+	// ⚠️ TEMPORARY STUB — your friend replaces this with real DB logic later.
+	// Answers whether a given book can be borrowed.
+	router.GET("/books/:id/availability", func(c *gin.Context) {
+		id := c.Param("id")
+		c.JSON(http.StatusOK, gin.H{
+			"book_id":   id,
+			"available": true,
+			"copies":    3,
+		})
+	})
 
 	// Start the server on port 8081
 	router.Run(":8081")
