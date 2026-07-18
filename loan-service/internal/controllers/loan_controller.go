@@ -16,7 +16,19 @@ type BorrowInput struct {
 	BookID uint `json:"book_id" binding:"required"`
 }
 
-// BorrowBook creates a loan for the logged-in member.
+// BorrowBook godoc
+// @Summary      Borrow a book
+// @Description  A logged-in member borrows a book (availability checked with Catalog)
+// @Tags         loans
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        input  body  BorrowInput  true  "Book to borrow"
+// @Success      201  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]interface{}
+// @Failure      409  {object}  map[string]interface{}
+// @Failure      503  {object}  map[string]interface{}
+// @Router       /loans [post]
 func BorrowBook(c *gin.Context) {
 	var input BorrowInput
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -24,7 +36,6 @@ func BorrowBook(c *gin.Context) {
 		return
 	}
 
-	// Who is borrowing? The middleware stored member_id in the context.
 	memberID, _ := c.Get("member_id")
 
 	// Ask the Catalog service whether the book is available
@@ -38,7 +49,6 @@ func BorrowBook(c *gin.Context) {
 		return
 	}
 
-	// Create the loan: borrowed now, due in 14 days.
 	loan := models.Loan{
 		MemberID:   memberID.(uint),
 		BookID:     input.BookID,
@@ -58,31 +68,38 @@ func BorrowBook(c *gin.Context) {
 	})
 }
 
-// ReturnBook marks a loan as returned and creates a fine if it's overdue.
+// ReturnBook godoc
+// @Summary      Return a book (librarian only)
+// @Description  A librarian processes a return; creates a fine if overdue
+// @Tags         loans
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id   path  int  true  "Loan ID"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      403  {object}  map[string]interface{}
+// @Failure      404  {object}  map[string]interface{}
+// @Router       /loans/{id}/return [post]
 func ReturnBook(c *gin.Context) {
-	loanID := c.Param("id")           // the loan id from the URL
-	memberID, _ := c.Get("member_id") // who's returning (from the token)
+	loanID := c.Param("id")
 
-	// Find the loan
+	// Only librarians can process returns
+	role, _ := c.Get("role")
+	if role != "librarian" {
+		c.JSON(http.StatusForbidden, gin.H{"error": "only librarians can process returns"})
+		return
+	}
+
 	var loan models.Loan
 	if err := database.DB.First(&loan, loanID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "loan not found"})
 		return
 	}
 
-	// Security: you can only return YOUR OWN loan
-	if loan.MemberID != memberID.(uint) {
-		c.JSON(http.StatusForbidden, gin.H{"error": "this is not your loan"})
-		return
-	}
-
-	// Can't return something already returned
 	if loan.Status == "returned" {
 		c.JSON(http.StatusConflict, gin.H{"error": "book already returned"})
 		return
 	}
 
-	// Mark it returned
 	now := time.Now()
 	loan.ReturnedAt = &now
 	loan.Status = "returned"
@@ -104,11 +121,18 @@ func ReturnBook(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "book returned successfully",
 		"loan":    loan,
-		"fine":    fine, // null if returned on time
+		"fine":    fine,
 	})
 }
 
-// GetMyLoans lists all loans belonging to the logged-in member.
+// GetMyLoans godoc
+// @Summary      List my loans
+// @Description  List all loans belonging to the logged-in member
+// @Tags         loans
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  map[string]interface{}
+// @Router       /loans [get]
 func GetMyLoans(c *gin.Context) {
 	memberID, _ := c.Get("member_id")
 
