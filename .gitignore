@@ -1,0 +1,18 @@
+# Compiled Go binaries
+*.exe
+*.exe~
+*.dll
+bin/
+
+# Test & coverage output
+*.test
+*.out
+
+# Environment files (contain secrets — NEVER commit these)
+.env
+!.env.example
+
+# Editor / OS junk
+.idea/
+.DS_Store
+Thumbs.db
