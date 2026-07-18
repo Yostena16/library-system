@@ -33,5 +33,7 @@ func SetupRoutes(router *gin.Engine) {
 	loans.Use(middleware.AuthMiddleware())
 	{
 		loans.POST("", controllers.BorrowBook) // POST /loans
+		loans.POST("/:id/return", controllers.ReturnBook)
 	}
+
 }
