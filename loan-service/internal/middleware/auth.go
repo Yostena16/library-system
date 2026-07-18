@@ -14,7 +14,7 @@ import (
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 1. Read the "Authorization" header
-		authHeader := c.GetHeader("Authorization")
+		authHeader := c.GetHeader("Authorization") //from the request
 		if authHeader == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "authorization header required"})
 			c.Abort()
@@ -62,6 +62,8 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		// 6. Save who's logged in, so handlers can use it
 		c.Set("member_id", uint(memberIDFloat))
+		role, _ := claims["role"].(string)
+		c.Set("role", role)
 
 		// 7. All good — let the request continue
 		c.Next()
