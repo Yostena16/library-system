@@ -8,6 +8,7 @@ import (
 
 	"loan-service/internal/database"
 	"loan-service/internal/models"
+	"loan-service/internal/utils"
 )
 
 type RegisterInput struct {
@@ -18,7 +19,7 @@ type RegisterInput struct {
 
 // Register creates a new member account.
 func Register(c *gin.Context) {
-	var input RegisterInput
+	var input RegisterInput //RegisterInput is a struct which hold empty inputs like name:" ", the c.ShouldBindJSON fills the data and its what the client send
 
 	// 1. Read + validate the JSON body
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -49,5 +50,47 @@ func Register(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "member registered successfully",
 		"member":  member,
+	})
+}
+
+// LoginInput is the JSON we expect when logging in.
+type LoginInput struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
+}
+
+// Login checks credentials and returns a JWT token.
+func Login(c *gin.Context) {
+	var input LoginInput
+
+	// 1. Read + validate the body
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// 2. Find the member by email
+	var member models.Member
+	if err := database.DB.Where("email = ?", input.Email).First(&member).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid email or password"})
+		return
+	}
+
+	// 3. Compare the given password with the stored hash
+	if err := bcrypt.CompareHashAndPassword([]byte(member.Password), []byte(input.Password)); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid email or password"})
+		return
+	}
+
+	// 4. Generate a JWT token
+	token, err := utils.GenerateToken(member.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not create token"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "login successful",
+		"token":   token,
 	})
 }
