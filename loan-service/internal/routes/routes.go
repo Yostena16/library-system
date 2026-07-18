@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"loan-service/internal/controllers"
+	"loan-service/internal/middleware"
 )
 
 // SetupRoutes connects URLs to controller functions.
@@ -20,4 +21,11 @@ func SetupRoutes(router *gin.Engine) {
 		auth.POST("/register", controllers.Register)
 		auth.POST("/login", controllers.Login)
 	}
+
+	members := router.Group("/members")
+	members.Use(middleware.AuthMiddleware())
+	{
+		members.GET("/me", controllers.GetMyProfile)
+	}
+
 }
