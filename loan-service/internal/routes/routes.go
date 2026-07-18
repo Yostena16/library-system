@@ -28,4 +28,10 @@ func SetupRoutes(router *gin.Engine) {
 		members.GET("/me", controllers.GetMyProfile)
 	}
 
+	// 🔒 Loans — require login
+	loans := router.Group("/loans")
+	loans.Use(middleware.AuthMiddleware())
+	{
+		loans.POST("", controllers.BorrowBook) // POST /loans
+	}
 }
