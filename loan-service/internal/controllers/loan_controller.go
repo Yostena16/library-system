@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"loan-service/internal/clients"
 	"loan-service/internal/database"
 	"loan-service/internal/models"
 )
@@ -26,7 +27,16 @@ func BorrowBook(c *gin.Context) {
 	// Who is borrowing? The middleware stored member_id in the context.
 	memberID, _ := c.Get("member_id")
 
-	// TODO (next step): ask the Catalog service if this book is available.
+	// Ask the Catalog service whether the book is available
+	availability, err := clients.CheckAvailability(input.BookID)
+	if err != nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "catalog service unavailable"})
+		return
+	}
+	if !availability.Available {
+		c.JSON(http.StatusConflict, gin.H{"error": "book is not available"})
+		return
+	}
 
 	// Create the loan: borrowed now, due in 14 days.
 	loan := models.Loan{
