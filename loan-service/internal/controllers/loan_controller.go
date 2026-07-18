@@ -57,3 +57,53 @@ func BorrowBook(c *gin.Context) {
 		"loan":    loan,
 	})
 }
+
+// ReturnBook marks a loan as returned and creates a fine if it's overdue.
+func ReturnBook(c *gin.Context) {
+	loanID := c.Param("id")           // the loan id from the URL
+	memberID, _ := c.Get("member_id") // who's returning (from the token)
+
+	// Find the loan
+	var loan models.Loan
+	if err := database.DB.First(&loan, loanID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "loan not found"})
+		return
+	}
+
+	// Security: you can only return YOUR OWN loan
+	if loan.MemberID != memberID.(uint) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "this is not your loan"})
+		return
+	}
+
+	// Can't return something already returned
+	if loan.Status == "returned" {
+		c.JSON(http.StatusConflict, gin.H{"error": "book already returned"})
+		return
+	}
+
+	// Mark it returned
+	now := time.Now()
+	loan.ReturnedAt = &now
+	loan.Status = "returned"
+	database.DB.Save(&loan)
+
+	// If overdue → create a fine ($1 per day late)
+	var fine *models.Fine
+	if now.After(loan.DueDate) {
+		daysLate := int(now.Sub(loan.DueDate).Hours() / 24)
+		newFine := models.Fine{
+			LoanID:   loan.ID,
+			MemberID: loan.MemberID,
+			Amount:   float64(daysLate) * 1.0,
+		}
+		database.DB.Create(&newFine)
+		fine = &newFine
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "book returned successfully",
+		"loan":    loan,
+		"fine":    fine, // null if returned on time
+	})
+}
