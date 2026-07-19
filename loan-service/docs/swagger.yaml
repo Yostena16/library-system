@@ -1,0 +1,146 @@
+basePath: /
+definitions:
+  controllers.BorrowInput:
+    properties:
+      book_id:
+        type: integer
+    required:
+    - book_id
+    type: object
+host: localhost:8082
+info:
+  contact: {}
+  description: Library system — Loan microservice (auth, members, borrowing, fines).
+  title: Loan Service API
+  version: "1.0"
+paths:
+  /fines:
+    get:
+      description: List all fines belonging to the logged-in member
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List my fines
+      tags:
+      - fines
+  /loans:
+    get:
+      description: List all loans belonging to the logged-in member
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List my loans
+      tags:
+      - loans
+    post:
+      consumes:
+      - application/json
+      description: A logged-in member borrows a book (availability checked with Catalog)
+      parameters:
+      - description: Book to borrow
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.BorrowInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "503":
+          description: Service Unavailable
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Borrow a book
+      tags:
+      - loans
+  /loans/{id}/return:
+    post:
+      description: A librarian processes a return; creates a fine if overdue
+      parameters:
+      - description: Loan ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Return a book (librarian only)
+      tags:
+      - loans
+  /members/me:
+    get:
+      description: Returns the logged-in member's profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my profile
+      tags:
+      - members
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

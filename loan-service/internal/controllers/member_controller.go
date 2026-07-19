@@ -9,9 +9,16 @@ import (
 	"loan-service/internal/models"
 )
 
-// GetMyProfile returns the logged-in member's own profile.
+// GetMyProfile godoc
+// @Summary      Get my profile
+// @Description  Returns the logged-in member's profile
+// @Tags         members
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  map[string]interface{}
+// @Failure      401  {object}  map[string]interface{}
+// @Router       /members/me [get]
 func GetMyProfile(c *gin.Context) {
-	// The middleware stored member_id in the context
 	memberID, _ := c.Get("member_id")
 
 	var member models.Member

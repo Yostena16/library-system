@@ -9,7 +9,14 @@ import (
 	"loan-service/internal/models"
 )
 
-// GetMyFines lists all fines belonging to the logged-in member.
+// GetMyFines godoc
+// @Summary      List my fines
+// @Description  List all fines belonging to the logged-in member
+// @Tags         fines
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  map[string]interface{}
+// @Router       /fines [get]
 func GetMyFines(c *gin.Context) {
 	memberID, _ := c.Get("member_id")
 

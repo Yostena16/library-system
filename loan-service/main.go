@@ -9,7 +9,18 @@ import (
 	"loan-service/internal/database"
 	"loan-service/internal/models"
 	"loan-service/internal/routes"
+
+	_ "loan-service/docs"
 )
+
+// @title           Loan Service API
+// @version         1.0
+// @description     Library system — Loan microservice (auth, members, borrowing, fines).
+// @host            localhost:8082
+// @BasePath        /
+// @securityDefinitions.apikey  BearerAuth
+// @in                          header
+// @name                        Authorization
 
 func main() {
 	// Load the .env file into the environment

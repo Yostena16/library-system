@@ -17,6 +17,17 @@ type RegisterInput struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 
+// Register godoc
+// @Summary      Register a new member
+// @Description  Create a new library member account
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        input  body  RegisterInput  true  "Registration details"
+// @Success      201  {object}  map[string]interface{}
+// @Failure      400  {object}  map[string]interface{}
+// @Router       /auth/register [post]
+
 // Register creates a new member account.
 func Register(c *gin.Context) {
 	var input RegisterInput
@@ -59,7 +70,18 @@ type LoginInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
+// Login godoc
+// @Summary      Log in a member
+// @Description  Authenticate and receive a JWT token
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        input  body  LoginInput  true  "Login credentials"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      401  {object}  map[string]interface{}
+// @Router       /auth/login [post]
 // Login checks credentials and returns a JWT token.
+
 func Login(c *gin.Context) {
 	var input LoginInput
 

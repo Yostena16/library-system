@@ -62,6 +62,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		// 6. Save who's logged in, so handlers can use it
 		c.Set("member_id", uint(memberIDFloat))
+
 		role, _ := claims["role"].(string)
 		c.Set("role", role)
 

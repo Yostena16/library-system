@@ -11,7 +11,6 @@ import (
 	"loan-service/internal/models"
 )
 
-// BorrowInput is the JSON we expect when borrowing.
 type BorrowInput struct {
 	BookID uint `json:"book_id" binding:"required"`
 }
@@ -38,7 +37,6 @@ func BorrowBook(c *gin.Context) {
 
 	memberID, _ := c.Get("member_id")
 
-	// Ask the Catalog service whether the book is available
 	availability, err := clients.CheckAvailability(input.BookID)
 	if err != nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "catalog service unavailable"})
@@ -56,16 +54,12 @@ func BorrowBook(c *gin.Context) {
 		DueDate:    time.Now().Add(14 * 24 * time.Hour),
 		Status:     "borrowed",
 	}
-
 	if err := database.DB.Create(&loan).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not create loan"})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{
-		"message": "book borrowed successfully",
-		"loan":    loan,
-	})
+	c.JSON(http.StatusCreated, gin.H{"message": "book borrowed successfully", "loan": loan})
 }
 
 // ReturnBook godoc
@@ -82,7 +76,6 @@ func BorrowBook(c *gin.Context) {
 func ReturnBook(c *gin.Context) {
 	loanID := c.Param("id")
 
-	// Only librarians can process returns
 	role, _ := c.Get("role")
 	if role != "librarian" {
 		c.JSON(http.StatusForbidden, gin.H{"error": "only librarians can process returns"})
@@ -105,24 +98,15 @@ func ReturnBook(c *gin.Context) {
 	loan.Status = "returned"
 	database.DB.Save(&loan)
 
-	// If overdue → create a fine ($1 per day late)
 	var fine *models.Fine
 	if now.After(loan.DueDate) {
 		daysLate := int(now.Sub(loan.DueDate).Hours() / 24)
-		newFine := models.Fine{
-			LoanID:   loan.ID,
-			MemberID: loan.MemberID,
-			Amount:   float64(daysLate) * 1.0,
-		}
+		newFine := models.Fine{LoanID: loan.ID, MemberID: loan.MemberID, Amount: float64(daysLate) * 1.0}
 		database.DB.Create(&newFine)
 		fine = &newFine
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "book returned successfully",
-		"loan":    loan,
-		"fine":    fine,
-	})
+	c.JSON(http.StatusOK, gin.H{"message": "book returned successfully", "loan": loan, "fine": fine})
 }
 
 // GetMyLoans godoc
