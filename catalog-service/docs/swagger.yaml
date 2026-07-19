@@ -1,0 +1,187 @@
+definitions:
+  controllers.BookInput:
+    properties:
+      author:
+        type: string
+      available_copies:
+        type: integer
+      category:
+        type: string
+      isbn:
+        type: string
+      title:
+        type: string
+      total_copies:
+        type: integer
+    required:
+    - title
+    type: object
+info:
+  contact: {}
+paths:
+  /books:
+    get:
+      description: Public — anyone can browse the catalog
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: List all books
+      tags:
+      - books
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Book to add
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.BookInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Add a book (librarian only)
+      tags:
+      - books
+  /books/{id}:
+    delete:
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Remove a book (librarian only)
+      tags:
+      - books
+    get:
+      description: Public — fetch a single book by ID
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get one book
+      tags:
+      - books
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated book fields
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.BookInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Edit a book (librarian only)
+      tags:
+      - books
+  /books/{id}/availability:
+    get:
+      description: Public — used by loan-service before allowing a borrow
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Check book availability
+      tags:
+      - books
+swagger: "2.0"

@@ -9,7 +9,18 @@ import (
 	"catalog-service/internal/database"
 	"catalog-service/internal/models"
 	"catalog-service/internal/routes"
+
+	_ "catalog-service/docs"
 )
+
+// @title           Catalog Service API
+// @version         1.0
+// @description     Library system — Catalog microservice (public book browsing, librarian management).
+// @host            localhost:8081
+// @BasePath        /
+// @securityDefinitions.apikey  BearerAuth
+// @in                          header
+// @name                        Authorization
 
 func main() {
 	// Load the .env file into the environment
