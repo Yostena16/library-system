@@ -2,13 +2,13 @@ package main
 
 import (
 	"log"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
 	"catalog-service/internal/database"
 	"catalog-service/internal/models"
+	"catalog-service/internal/routes"
 )
 
 func main() {
@@ -28,17 +28,7 @@ func main() {
 
 	router := gin.Default()
 
-	// A "health check" route: GET /health tells us the service is alive
-	router.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"status":  "ok",
-			"service": "catalog-service",
-		})
-	})
-
-	// Routes (public book browsing + librarian management) get wired up
-	// via routes.SetupRoutes() once that package exists — for now this
-	// keeps the service runnable at each step.
+	routes.SetupRoutes(router)
 
 	router.Run(":8081")
 }
