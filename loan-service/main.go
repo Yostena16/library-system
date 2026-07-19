@@ -26,6 +26,8 @@ func main() {
 	}
 	log.Println("✅ Database migrated")
 
+	database.SeedLibrarian()
+
 	router := gin.Default()
 
 	routes.SetupRoutes(router)
