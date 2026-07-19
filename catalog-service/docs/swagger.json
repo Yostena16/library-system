@@ -1,8 +1,13 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "Library system — Catalog microservice (public book browsing, librarian management).",
+        "title": "Catalog Service API",
+        "contact": {},
+        "version": "1.0"
     },
+    "host": "localhost:8081",
+    "basePath": "/",
     "paths": {
         "/books": {
             "get": {
@@ -281,6 +286,13 @@
                     "type": "integer"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

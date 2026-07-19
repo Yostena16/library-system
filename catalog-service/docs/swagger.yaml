@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   controllers.BookInput:
     properties:
@@ -16,8 +17,13 @@ definitions:
     required:
     - title
     type: object
+host: localhost:8081
 info:
   contact: {}
+  description: Library system — Catalog microservice (public book browsing, librarian
+    management).
+  title: Catalog Service API
+  version: "1.0"
 paths:
   /books:
     get:
@@ -184,4 +190,9 @@ paths:
       summary: Check book availability
       tags:
       - books
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
