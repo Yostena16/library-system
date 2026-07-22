@@ -54,6 +54,7 @@ const swaggerHTML = `<!DOCTYPE html>
     window.onload = function () {
       SwaggerUIBundle({
         urls: [
+          { url: "/api/auth/swagger/doc.json", name: "Auth Service" },
           { url: "/api/loan/swagger/doc.json", name: "Loan Service" },
           { url: "/api/catalog/swagger/doc.json", name: "Catalog Service" }
         ],
@@ -72,6 +73,7 @@ const swaggerHTML = `<!DOCTYPE html>
 func main() {
 	godotenv.Load()
 
+	authURL := getEnv("AUTH_SERVICE_URL", "http://localhost:8083")
 	catalogURL := getEnv("CATALOG_SERVICE_URL", "http://localhost:8081")
 	loanURL := getEnv("LOAN_SERVICE_URL", "http://localhost:8082")
 
@@ -81,6 +83,7 @@ func main() {
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(swaggerHTML))
 	})
 
+	router.Any("/api/auth/*proxyPath", reverseProxy(authURL, "/api/auth"))
 	router.Any("/api/catalog/*proxyPath", reverseProxy(catalogURL, "/api/catalog"))
 	router.Any("/api/loan/*proxyPath", reverseProxy(loanURL, "/api/loan"))
 
