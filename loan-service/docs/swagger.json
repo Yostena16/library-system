@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "Library system — Loan microservice (auth, members, borrowing, fines).",
+        "description": "Library system — Loan microservice (borrowing, returns, fines).",
         "title": "Loan Service API",
         "contact": {},
         "version": "1.0"
@@ -161,39 +161,6 @@
                     },
                     "404": {
                         "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/members/me": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Returns the logged-in member's profile",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "members"
-                ],
-                "summary": "Get my profile",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true

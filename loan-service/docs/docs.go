@@ -174,39 +174,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/members/me": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Returns the logged-in member's profile",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "members"
-                ],
-                "summary": "Get my profile",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -238,7 +205,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Loan Service API",
-	Description:      "Library system — Loan microservice (auth, members, borrowing, fines).",
+	Description:      "Library system — Loan microservice (borrowing, returns, fines).",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

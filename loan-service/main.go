@@ -15,29 +15,23 @@ import (
 
 // @title           Loan Service API
 // @version         1.0
-// @description     Library system — Loan microservice (auth, members, borrowing, fines).
+// @description     Library system — Loan microservice (borrowing, returns, fines).
 // @host            localhost:8082
 // @BasePath        /
 // @securityDefinitions.apikey  BearerAuth
 // @in                          header
 // @name                        Authorization
-
 func main() {
-	// Load the .env file into the environment
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found — using system environment variables")
 	}
 
-	// Connect to PostgreSQL
 	database.Connect()
 
-	// Auto-migrate: make the tables match our models
-	if err := database.DB.AutoMigrate(&models.Member{}, &models.Loan{}, &models.Fine{}); err != nil {
+	if err := database.DB.AutoMigrate(&models.Loan{}, &models.Fine{}); err != nil {
 		log.Fatal("❌ Migration failed: ", err)
 	}
 	log.Println("✅ Database migrated")
-
-	database.SeedLibrarian()
 
 	router := gin.Default()
 

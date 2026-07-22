@@ -20,24 +20,11 @@ func SetupRoutes(router *gin.Engine) {
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// Group all auth routes under /auth
-	auth := router.Group("/auth")
-	{
-		auth.POST("/register", controllers.Register)
-		auth.POST("/login", controllers.Login)
-	}
-
-	members := router.Group("/members")
-	members.Use(middleware.AuthMiddleware())
-	{
-		members.GET("/me", controllers.GetMyProfile)
-	}
-
-	//  Loans — require login
+	// Loans — require login
 	loans := router.Group("/loans")
 	loans.Use(middleware.AuthMiddleware())
 	{
-		loans.POST("", controllers.BorrowBook) // POST /loans
+		loans.POST("", controllers.BorrowBook)
 		loans.POST("/:id/return", controllers.ReturnBook)
 		loans.GET("", controllers.GetMyLoans)
 	}

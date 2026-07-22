@@ -10,7 +10,7 @@ definitions:
 host: localhost:8082
 info:
   contact: {}
-  description: Library system — Loan microservice (auth, members, borrowing, fines).
+  description: Library system — Loan microservice (borrowing, returns, fines).
   title: Loan Service API
   version: "1.0"
 paths:
@@ -117,27 +117,6 @@ paths:
       summary: Return a book (librarian only)
       tags:
       - loans
-  /members/me:
-    get:
-      description: Returns the logged-in member's profile
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - BearerAuth: []
-      summary: Get my profile
-      tags:
-      - members
 securityDefinitions:
   BearerAuth:
     in: header
